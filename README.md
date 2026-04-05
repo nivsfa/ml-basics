@@ -12,6 +12,6 @@ This repo currently contains a single interactive notebook for learning about ba
 ### Actual environment setup guide
 1. Install uv: `curl -LsSf https://astral.sh/uv/install.sh | sh`
 1. Get packages: `uv sync`
-1. Load interactive app: `uv run marimo run interactive_ml_course.py` (wait for response then open localhost:port)
+1. Load interactive app: `./load_exercise.sh` and then follow the instructions
 1. Optional: Create / edit a marimo notebook: `./marimo.sh`
 
