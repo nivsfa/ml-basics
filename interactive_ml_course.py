@@ -459,6 +459,7 @@ def _(
         Xb = np.hstack([np.ones((X_tr.shape[0], 1)), X_tr])
         theta = np.linalg.pinv(Xb.T @ Xb) @ Xb.T @ y_tr
         Xb_te = np.hstack([np.ones((X_te.shape[0], 1)), X_te])
+        return Xb_te @ theta
 
     _ref_preds = _linreg_ref(X_reg_train, y_reg_train, X_reg_test)
     linreg_ref_mse = float(np.mean((_ref_preds - y_reg_test) ** 2))
