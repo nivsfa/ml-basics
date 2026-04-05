@@ -1,7 +1,7 @@
 # ML Basics
 Basic (and possibly complex) ML concepts implementations
 
-This repo currently contains a single interactive notebook for learning about basic ML concepts and implementing them.
+This repo currently contains interactive notebooks for learning about basic ML concepts and implementing them.
 
 ## Installation Guide:
 ### Github stuff
