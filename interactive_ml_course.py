@@ -249,18 +249,12 @@ def _(load_text, mo):
 
     def fit(self, X, y):
         """Store training data — KNN does no real training."""
-        # TODO: store X and y as instance attributes
         pass
 
     def predict(self, X):
         """Predict class labels for each row in X."""
         predictions = []
         for x in X:
-            # TODO:
-            # 1. Compute Euclidean distances from x to every training point
-            # 2. Find the indices of the k smallest distances
-            # 3. Get the corresponding labels
-            # 4. Return the majority label  (hint: np.bincount + np.argmax)
             pass
     '''
     knn_class_name = 'KNNClassifier'
@@ -396,7 +390,6 @@ def _(load_text, mo):
         """Solve theta = (X^T X)^{-1} X^T y."""
         Xb = self._add_bias(X)
         # TODO: compute self.theta using the normal equation
-        # Hint: np.linalg.pinv is safer than np.linalg.inv
         pass
 
     def fit_gradient_descent(self, X, y):
@@ -405,16 +398,11 @@ def _(load_text, mo):
         n, d = Xb.shape
         self.theta = np.zeros(d)
         for _ in range(self.epochs):
-            # TODO:
-            # 1. Compute predictions: Xb @ self.theta
-            # 2. Compute gradient: (2/n) * Xb.T @ (predictions - y)
-            # 3. Update self.theta
             pass
 
     def predict(self, X):
         """Return predicted values."""
         Xb = self._add_bias(X)
-        # TODO: return Xb @ self.theta
         pass
     '''
     lr_class_name = 'LinearRegression'
@@ -459,6 +447,7 @@ def _(
         Xb = np.hstack([np.ones((X_tr.shape[0], 1)), X_tr])
         theta = np.linalg.pinv(Xb.T @ Xb) @ Xb.T @ y_tr
         Xb_te = np.hstack([np.ones((X_te.shape[0], 1)), X_te])
+        return Xb_te @ theta
 
     _ref_preds = _linreg_ref(X_reg_train, y_reg_train, X_reg_test)
     linreg_ref_mse = float(np.mean((_ref_preds - y_reg_test) ** 2))
@@ -538,7 +527,6 @@ def _(load_text, mo):
 
     def _sigmoid(self, z):
         """Numerically stable sigmoid: clip z to avoid overflow."""
-        # TODO: return 1 / (1 + np.exp(-z))
         # Hint: use np.clip(z, -500, 500) inside exp for stability
         pass
 
@@ -550,19 +538,13 @@ def _(load_text, mo):
         n, d = Xb.shape
         self.theta = np.zeros(d)
         for _ in range(self.epochs):
-            # TODO:
-            # 1. p_hat = self._sigmoid(Xb @ self.theta)
-            # 2. gradient = (1/n) * Xb.T @ (p_hat - y)
-            # 3. self.theta -= self.learning_rate * gradient
             pass
 
     def predict_proba(self, X):
         Xb = self._add_bias(X)
-        # TODO: return self._sigmoid(Xb @ self.theta)
         pass
 
     def predict(self, X):
-        # TODO: return (self.predict_proba(X) >= 0.5).astype(int)
         pass
     '''
     logr_class_name = 'LogisticRegression'
@@ -698,25 +680,17 @@ def _(load_text, mo):
         n_total = len(y)
         for c in self.classes:
             X_c = X[y == c]
-            # TODO:
-            # self.log_priors[c]  = np.log(fraction of samples with class c)
-            # self.means[c]       = per-feature mean of X_c
-            # self.variances[c]   = per-feature variance of X_c  (+1e-9 for stability)
             pass
 
     def _log_likelihood(self, x, c):
         """Sum of log-Gaussian densities across features for class c."""
         mu = self.means[c]
         var = self.variances[c]
-        # log N(x_j; mu_j, var_j) = -0.5*log(2*pi*var_j) - (x_j-mu_j)^2 / (2*var_j)
-        # TODO: return np.sum(...) across features
         pass
 
     def predict(self, X):
         preds = []
         for x in X:
-            # TODO: compute log_prior + log_likelihood for each class,
-            # then append the class with the highest score
             pass
     '''
     gnb_class_name = 'GaussianNaiveBayes'
@@ -858,7 +832,6 @@ def _(load_text, mo):
 
     def _gini(self, y):
         """Gini impurity of label array y."""
-        # TODO: 1 - sum(p_c^2) for each class c
         # Hint: np.bincount(y) / len(y) gives the class proportions
         pass
 
@@ -880,10 +853,6 @@ def _(load_text, mo):
         """Recursively build the tree; return a node dict."""
         if depth >= self.max_depth or len(np.unique(y)) == 1:
         if feat is None:
-        # mask = X[:, feat] <= thresh
-        # Return {"leaf": False, "feat": feat, "thresh": thresh,
-        #         "left":  self._build(X[mask],  y[mask],  depth+1),
-        #         "right": self._build(X[~mask], y[~mask], depth+1)}
         pass
 
     def fit(self, X, y):
@@ -897,7 +866,6 @@ def _(load_text, mo):
         pass
 
     def predict(self, X):
-        # TODO: return np.array([self._predict_one(x, self.tree) for x in X])
         pass
     '''
     tree_class_name = 'DecisionTree'
@@ -1059,8 +1027,6 @@ def _(load_text, mo):
         """Return cluster index for each point in X."""
         # TODO:
         # Compute distance from each point to each centroid.
-        # Shape hint: ((X[:, None] - self.centroids[None]) ** 2).sum(axis=2) → (n, k)
-        # Return argmin along axis=1
         pass
 
     def fit(self, X):
@@ -1206,12 +1172,10 @@ def _(load_text, mo):
                 # TODO:
                 # 1. Compute prediction: 1 if (xi @ self.weights + self.bias) >= 0 else 0
                 # 2. error = yi - prediction
-                # 3. self.weights += self.learning_rate * error * xi
-                # 4. self.bias    += self.learning_rate * error
+                # 3. Update weights and biases
                 pass
 
     def predict(self, X):
-        # TODO: return (X @ self.weights + self.bias >= 0).astype(int)
         pass
     '''
     perc_class_name = 'Perceptron'
@@ -1352,17 +1316,10 @@ def _(load_text, mo):
         """Solve the Ridge normal equation."""
         Xb = self._add_bias(X)
         n, d = Xb.shape
-        # TODO:
-        # 1. I = np.eye(d)
-        # 2. I[0, 0] = 0  # do not regularise the bias
-        # 3. A = Xb.T @ Xb + self.alpha * I
-        # 4. b_vec = Xb.T @ y
-        # 5. self.theta = np.linalg.solve(A, b_vec)  (safer than inv)
         pass
 
     def predict(self, X):
         Xb = self._add_bias(X)
-        # TODO: return Xb @ self.theta
         pass
     '''
     ridge_class_name = 'RidgeRegression'
