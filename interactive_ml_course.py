@@ -1095,6 +1095,9 @@ def _(X_unsup, kmeans_class_name, kmeans_editor, mo, np, save_text):
             centroids = new_c
         dists = ((X[:, None] - centroids[None]) ** 2).sum(axis=2)
         labels = dists.argmin(axis=1)
+        min_dists_sq = dists[np.arange(len(X)), labels]
+        inertia = np.sum(min_dists_sq)
+        return inertia
 
     kmeans_ref_inertia = _kmeans_ref_inertia(X_unsup)
 
@@ -1367,6 +1370,7 @@ def _(
         I[0, 0] = 0
         theta = np.linalg.solve(Xb.T @ Xb + alpha * I, Xb.T @ y_tr)
         Xb_te = np.hstack([np.ones((X_te.shape[0], 1)), X_te])
+        return Xb_te @ theta
 
     _ref_preds = _ridge_ref(X_reg_train, y_reg_train, X_reg_test)
     ridge_ref_mse = float(np.mean((_ref_preds - y_reg_test) ** 2))
