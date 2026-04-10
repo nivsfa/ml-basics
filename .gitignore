@@ -1,1 +1,4 @@
 local_files/
+
+db_exercises/*.db
+db_exercises/*.db.wal

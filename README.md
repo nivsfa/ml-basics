@@ -15,3 +15,6 @@ This repo currently contains interactive notebooks for learning about basic ML c
 1. Load interactive app: `./load_exercise.sh` and then follow the instructions
 1. Optional: Create / edit a marimo notebook: `./marimo.sh`
 
+### SQL Practice
+1. Run `uv run python db_exercises/setup_db.py`
+1. This creates a local `analytics.db` file used by the notebooks.

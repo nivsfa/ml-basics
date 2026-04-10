@@ -27,7 +27,7 @@ select file in "${EXERCISES[@]}"; do
         echo "------------------------------------------"
         
         # Execute the command
-        uv run marimo run "$file"
+        uv run marimo run "$file" --headless
         break
     else
         echo "Invalid selection. Please try again."
