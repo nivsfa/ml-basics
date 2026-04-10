@@ -186,7 +186,7 @@ def _(load_text, mo):
             pass
     '''
     mlp_editor = mo.ui.code_editor(
-        value=load_text("mlp_exercise.py", mlp_code_initial),
+        value=load_text("mlp_exercise", mlp_code_initial),
         language="python",
     )
     mlp_editor
@@ -311,7 +311,7 @@ def _(load_text, mo):
             pass
     '''
     svm_editor = mo.ui.code_editor(
-        value=load_text("svm_exercise.py", svm_code_initial),
+        value=load_text("svm_exercise", svm_code_initial),
         language="python",
     )
     svm_editor
@@ -421,7 +421,7 @@ def _(load_text, mo):
             pass
     '''
     pca_editor = mo.ui.code_editor(
-        value=load_text("pca_exercise.py", pca_code_initial),
+        value=load_text("pca_exercise", pca_code_initial),
         language="python",
     )
     pca_editor
@@ -470,7 +470,8 @@ def _(PCA, X_cls, mo, pca_ok, plt, y_cls):
     _pca_viz.fit(X_cls)
     _X_reduced = _pca_viz.transform(X_cls)
     # Reconstruct for visualization
-    _X_projected = (_X_reduced @ _pca_viz.components) + _pca_viz.mean
+    _X_projected = (_X_reduced @ _pca_viz.components.T) + _pca_viz.mean
+    print(_pca_viz.cov_mat)
 
     fig_pca, ax_pca = plt.subplots(figsize=(7, 5))
     ax_pca.scatter(X_cls[:, 0], X_cls[:, 1], c=y_cls, alpha=0.2, cmap="bwr")
@@ -504,6 +505,75 @@ def _(mo):
 
 
 @app.cell
+def _(np):
+    class DecisionTree:
+        """Decision Tree Classifier using Gini impurity."""
+    
+        def __init__(self, max_depth=5):
+            self.max_depth = max_depth
+            self.tree = None
+    
+        def _gini(self, y):
+            """Gini impurity of label array y."""
+            # Hint: np.bincount(y) / len(y) gives the class proportions
+            return 1 - np.sum((np.bincount(y) / len(y)) ** 2)
+    
+        def _best_split(self, X, y):
+            """Return (feature_index, threshold) with the lowest weighted Gini."""
+            best_gini = float("inf")
+            best_feat, best_thresh = None, None
+            n = len(y)
+            for feat in range(X.shape[1]):
+                for thresh in np.unique(X[:, feat]):
+                    left  = y[X[:, feat] <= thresh]
+                    right = y[X[:, feat] >  thresh]
+                    if len(left) == 0 or len(right) == 0:
+                        continue
+                    # TODO: compute weighted_gini and compare to best_gini
+                    weighted_gini = (left.shape[0] / n) * self._gini(left) + (right.shape[0] / n) * self._gini(right)
+                    if weighted_gini < best_gini:
+                        best_gini, best_feat, best_thresh = weighted_gini, feat, thresh
+            return best_feat, best_thresh
+
+        def _build(self, X, y, depth):
+            """Recursively build the tree; return a node dict."""
+            stopping_criteria = depth >= self.max_depth or len(np.unique(y)) == 1 or X.shape[0] < 2
+            if stopping_criteria:
+                return {'leaf': True, 'class': np.argmax(np.bincount(y))}
+        
+            feat, thresh = self._best_split(X, y)
+            if feat is None:
+                return {'leaf': True, 'class': np.argmax(np.bincount(y))}
+        
+            left_mask, right_mask = X[:, feat] <= thresh, X[:, feat] > thresh
+        
+            return {
+              'leaf': False,
+              'feat': feat,
+              'best_thresh': thresh,
+              'left': self._build(X[left_mask], y[left_mask], depth + 1),
+              'right': self._build(X[right_mask], y[right_mask], depth + 1)
+            }
+    
+        def fit(self, X, y):
+            # TODO: self.tree = self._build(X, y, depth=0)
+            self.tree = self._build(X, y, depth=0)
+    
+        def _predict_one(self, x, node):
+            """Traverse the tree for a single sample."""
+            if node['leaf']:
+                # TODO: recurse left if x[node["feat"]] <= node["thresh"], else right
+                return node['class']
+            if x[node['feat']] <= node['best_thresh']:
+                return self._predict_one(x, node['left'])
+            return self._predict_one(x, node['right'])
+    
+        def predict(self, X):
+            return np.array([self._predict_one(x, self.tree) for x in X])
+    return (DecisionTree,)
+
+
+@app.cell
 def _(load_text, mo):
     rf_code_initial = r'''class RandomForest:
         def __init__(self, n_trees=10, max_depth=5, sample_size_ratio=0.8):
@@ -517,12 +587,7 @@ def _(load_text, mo):
             n_samples = X.shape[0]
             for _ in range(self.n_trees):
                 # 1. Bootstrap: Sample indices with replacement
-                # idx = np.random.choice(...)
-
                 # 2. Train a DecisionTree (using the class from previous course)
-                # tree = DecisionTree(max_depth=self.max_depth)
-                # tree.fit(X[idx], y[idx])
-                # self.trees.append(tree)
                 pass
 
         def predict(self, X):
@@ -530,7 +595,7 @@ def _(load_text, mo):
             pass
     '''
     rf_editor = mo.ui.code_editor(
-        value=load_text("rf_exercise.py", rf_code_initial),
+        value=load_text("rf_exercise", rf_code_initial),
         language="python",
     )
     rf_editor
@@ -665,7 +730,7 @@ def _(load_text, mo, save_text):
             pass
     '''
     gb_editor = mo.ui.code_editor(
-        value=load_text("gb_exercise.py", gb_code_initial),
+        value=load_text("gb_exercise", gb_code_initial),
         language="python",
         on_change=lambda v: save_text("gb_exercise", v),
     )
@@ -757,36 +822,102 @@ def _(mo):
 
 
 @app.cell
-def _(load_text, mo, save_text):
+def _(load_text, mo):
     dbscan_code_initial = r'''class DBSCAN:
+        """
+        Density-Based Spatial Clustering of Applications with Noise (DBSCAN)
+
+        Parameters
+        ----------
+        eps : float
+            Maximum distance between two samples to be considered neighbors.
+        min_samples : int
+            Minimum number of neighbors required to form a core point.
+        """
+
         def __init__(self, eps=0.5, min_samples=5):
             self.eps = eps
             self.min_samples = min_samples
             self.labels_ = None
 
         def fit(self, X):
+            """
+            Fit DBSCAN clustering on dataset X.
+
+            Parameters
+            ----------
+            X : np.ndarray of shape (n_samples, n_features)
+            """
             n_samples = X.shape[0]
-            self.labels_ = np.full(n_samples, -1) # -1 is Noise
+            # Initialize all points as noise (-1)
+            self.labels_ = np.full(n_samples, -1)
+            # Track visited points
+            visited = np.zeros(n_samples, dtype=bool)
             cluster_id = 0
-
             for i in range(n_samples):
-                if self.labels_[i] != -1: continue # Already visited
-
-                # 1. Find neighbors within eps
-                # neighbors = self._get_neighbors(X, i)
-
-                # 2. If len(neighbors) < min_samples: label as noise (-1)
-                # 3. Else: Start new cluster and expand recursively
+                # TODO 1: Skip if already visited
                 pass
+                # TODO 2: Mark current point as visited
+                pass
+                # TODO 3: Find neighbors of point i
+                neighbors = None
+                # TODO 4: If not enough neighbors → mark as noise
+                # (keep label = -1)
+                pass
+                # TODO 5: Else → expand cluster
+                # - call _expand_cluster(...)
+                # - increment cluster_id
+                pass
+            return self
 
         def _get_neighbors(self, X, idx):
-            # Euclidean distance check
+            """
+            Find all points within eps distance of X[idx].
+
+            Returns
+            -------
+            neighbors : np.ndarray of indices
+            """
+            # TODO 6:
+            # Compute Euclidean distances from X[idx] to all points
+            # Hint: np.linalg.norm(..., axis=1)
+            dists = None
+            # TODO 7:
+            # Return indices where distance <= eps
+            neighbors = None
+            return neighbors
+
+        def _expand_cluster(self, X, visited, point_idx, neighbors, cluster_id):
+            """
+            Expand cluster starting from a core point.
+
+            Parameters
+            ----------
+            point_idx : int
+                Index of the starting core point
+            neighbors : np.ndarray
+                Neighbor indices of the core point
+            """
+            # TODO 8: Assign cluster_id to the starting point
             pass
+            i = 0
+            while i < len(neighbors):
+                neighbor_idx = neighbors[i]
+                # TODO 9:
+                # If neighbor not visited:
+                #   - mark visited
+                #   - get its neighbors
+                # TODO 10:
+                # If neighbor is a core point:
+                #   - merge its neighbors into current neighbors list
+                # TODO 11:
+                # If neighbor is noise (-1):
+                #   - assign it to current cluster
+                i += 1
     '''
     dbscan_editor = mo.ui.code_editor(
         value=load_text("dbscan_exercise", dbscan_code_initial),
         language="python",
-        on_change=lambda v: save_text("dbscan_exercise.py", v),
     )
     dbscan_editor
     return (dbscan_editor,)
@@ -799,7 +930,7 @@ def _(X_unsup, dbscan_editor, mo, np, save_text):
         exec(dbscan_editor.value, _ns)
         DBSCAN = _ns["DBSCAN"]
 
-        _db = DBSCAN(eps=0.3, min_samples=5)
+        _db = DBSCAN(eps=0.2, min_samples=5)
         _db.fit(X_unsup)
 
         db_labels = _db.labels_
@@ -813,7 +944,7 @@ def _(X_unsup, dbscan_editor, mo, np, save_text):
         db_ok = False
         mo.stop(True, mo.callout(mo.md(f"**DBSCAN not ready yet:** {_e}"), kind="warn"))
 
-    save_text("dbscan_exercise", dbscan_editor.value)
+    save_text(dbscan_editor.value, "dbscan_exercise")
     mo.callout(mo.md(f"✅ **DBSCAN** — Clusters found: **{n_clusters}**. Noise points: **{np.sum(db_labels == -1)}**"), kind="success")
     return db_labels, db_ok
 
@@ -861,7 +992,7 @@ def _(load_text, mo, save_text):
     hdbscan_editor = mo.ui.code_editor(
         value=load_text("hdbscan_exercise", hdbscan_code_initial),
         language="python",
-        on_change=lambda v: save_text("hdbscan_exercise.py", v),
+        on_change=lambda v: save_text("hdbscan_exercise", v),
     )
     hdbscan_editor
     return (hdbscan_editor,)
@@ -949,7 +1080,7 @@ def _(mo):
 
 
 @app.cell
-def _(load_text, mo, save_text):
+def _(load_text, mo):
     adam_code_initial = r'''def adam_update(w, dw, m, v, t, lr=0.001, b1=0.9, b2=0.999, eps=1e-8):
         # 1. Update biased first moment estimate
         # m = ...
@@ -964,9 +1095,8 @@ def _(load_text, mo, save_text):
         return w, m, v
     '''
     adam_editor = mo.ui.code_editor(
-        value=load_text("adam_exercise.py", adam_code_initial),
+        value=load_text("adam_exercise", adam_code_initial),
         language="python",
-        on_change=lambda v: save_text("adam_exercise.py", v),
     )
     adam_editor
     return
@@ -1012,7 +1142,7 @@ def _(X_cls, mo, np, plt, show_kernel_trick, y_cls):
 
 
 @app.cell
-def _(load_text, mo, save_text):
+def _(load_text, mo):
     roc_code_initial = r'''def compute_roc(y_true, y_probs):
         thresholds = np.linspace(0, 1, 100)
         tpr = [] # True Positive Rate
@@ -1027,11 +1157,45 @@ def _(load_text, mo, save_text):
         return fpr, tpr
     '''
     roc_editor = mo.ui.code_editor(
-        value=load_text("roc_exercise.py", roc_code_initial),
+        value=load_text("roc_exercise", roc_code_initial),
         language="python",
-        on_change=lambda v: save_text("roc_exercise.py", v),
     )
     roc_editor
+    return (roc_editor,)
+
+
+@app.cell
+def _(plt, roc_editor):
+    from sklearn.metrics import auc
+
+    def plot_roc_curve(fpr, tpr):
+        """
+        Plots the ROC curve given False Positive Rate (FPR) and True Positive Rate (TPR).
+        """
+        # Calculate the Area Under the Curve (AUC)
+        roc_auc = auc(fpr, tpr)
+    
+        plt.figure(figsize=(8, 6))
+    
+        # Plot the ROC curve
+        plt.plot(fpr, tpr, color='darkorange', lw=2, 
+                 label=f'ROC curve (area = {roc_auc:.2f})')
+    
+        # Plot the diagonal 'no-skill' line (random guessing)
+        plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--', label='Random Guessing')
+    
+        # Set plot limits and labels
+        plt.xlim([0.0, 1.0])
+        plt.ylim([0.0, 1.05])
+        plt.xlabel('False Positive Rate (FPR)')
+        plt.ylabel('True Positive Rate (TPR)')
+        plt.title('Receiver Operating Characteristic (ROC) Curve')
+        plt.legend(loc="lower right")
+        plt.grid(alpha=0.3)
+    
+        plt.show()
+
+    exec(roc_editor.value)
     return
 
 
