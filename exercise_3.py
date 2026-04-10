@@ -56,7 +56,7 @@ def _(duckdb, mo, os):
 
     def run_query(sql: str, name: str = ""):
         """Execute SQL against the analytics DuckDB and return a DataFrame.
-        If name is provided, saves the result as a CSV to local_files/sql/<name>.csv."""
+        If name is provided, saves the query as a txt to local_files/sql/<name>.txt."""
         try:
             con = duckdb.connect(DB_PATH, read_only=True)
             result = con.execute(sql).df()
@@ -64,7 +64,8 @@ def _(duckdb, mo, os):
             if name:
                 save_dir = "local_files/sql"
                 os.makedirs(save_dir, exist_ok=True)
-                result.to_csv(f"{save_dir}/{name}.csv", index=False)
+                with open(f"{save_dir}/{name}.txt", "w") as f:
+                    f.write(sql)
             return result, None
         except Exception as e:
             return None, str(e)
@@ -126,6 +127,17 @@ def _(mo, run_query):
 
 
 @app.cell
+def _(os):
+    def get_answer(name: str) -> str:
+        path = f"local_files/sql/{name}.txt"
+        if os.path.exists(path):
+            with open(path, "r") as f:
+                return f.read()
+        return "-- Write your SQL here\n"
+    return (get_answer,)
+
+
+@app.cell
 def _(mo):
     mo.md("""---\n## 📗 Section 1 — Basic SELECT & Filtering""")
     return
@@ -138,8 +150,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q1_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q1_editor = mo.ui.code_editor(value=get_answer('q1'), language="sql")
     q1_editor
     return (q1_editor,)
 
@@ -169,8 +181,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q2_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q2_editor = mo.ui.code_editor(value=get_answer('q2'), language="sql")
     q2_editor
     return (q2_editor,)
 
@@ -200,8 +212,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q3_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q3_editor = mo.ui.code_editor(value=get_answer('q3'), language="sql")
     q3_editor
     return (q3_editor,)
 
@@ -231,8 +243,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q4_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q4_editor = mo.ui.code_editor(value=get_answer('q4'), language="sql")
     q4_editor
     return (q4_editor,)
 
@@ -262,8 +274,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q5_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q5_editor = mo.ui.code_editor(value=get_answer('q5'), language="sql")
     q5_editor
     return (q5_editor,)
 
@@ -299,8 +311,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q6_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q6_editor = mo.ui.code_editor(value=get_answer('q6'), language="sql")
     q6_editor
     return (q6_editor,)
 
@@ -330,8 +342,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q7_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q7_editor = mo.ui.code_editor(value=get_answer('q7'), language="sql")
     q7_editor
     return (q7_editor,)
 
@@ -361,8 +373,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q8_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q8_editor = mo.ui.code_editor(value=get_answer('q8'), language="sql")
     q8_editor
     return (q8_editor,)
 
@@ -392,8 +404,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q9_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q9_editor = mo.ui.code_editor(value=get_answer('q9'), language="sql")
     q9_editor
     return (q9_editor,)
 
@@ -423,8 +435,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q10_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q10_editor = mo.ui.code_editor(value=get_answer('q10'), language="sql")
     q10_editor
     return (q10_editor,)
 
@@ -467,8 +479,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q11_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q11_editor = mo.ui.code_editor(value=get_answer('q11'), language="sql")
     q11_editor
     return (q11_editor,)
 
@@ -503,8 +515,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q12_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q12_editor = mo.ui.code_editor(value=get_answer('q12'), language="sql")
     q12_editor
     return (q12_editor,)
 
@@ -541,8 +553,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q13_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q13_editor = mo.ui.code_editor(value=get_answer('q13'), language="sql")
     q13_editor
     return (q13_editor,)
 
@@ -580,8 +592,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q14_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q14_editor = mo.ui.code_editor(value=get_answer('q14'), language="sql")
     q14_editor
     return (q14_editor,)
 
@@ -628,8 +640,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q15_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q15_editor = mo.ui.code_editor(value=get_answer('q15'), language="sql")
     q15_editor
     return (q15_editor,)
 
@@ -664,8 +676,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q16_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q16_editor = mo.ui.code_editor(value=get_answer('q16'), language="sql")
     q16_editor
     return (q16_editor,)
 
@@ -708,8 +720,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q17_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q17_editor = mo.ui.code_editor(value=get_answer('q17'), language="sql")
     q17_editor
     return (q17_editor,)
 
@@ -786,8 +798,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q18_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q18_editor = mo.ui.code_editor(value=get_answer('q18'), language="sql")
     q18_editor
     return (q18_editor,)
 
@@ -830,8 +842,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q19_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q19_editor = mo.ui.code_editor(value=get_answer('q19'), language="sql")
     q19_editor
     return (q19_editor,)
 
@@ -873,8 +885,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q20_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q20_editor = mo.ui.code_editor(value=get_answer('q20'), language="sql")
     q20_editor
     return (q20_editor,)
 
@@ -914,8 +926,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q21_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q21_editor = mo.ui.code_editor(value=get_answer('q21'), language="sql")
     q21_editor
     return (q21_editor,)
 
@@ -964,8 +976,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q22_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q22_editor = mo.ui.code_editor(value=get_answer('q22'), language="sql")
     q22_editor
     return (q22_editor,)
 
@@ -1002,8 +1014,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q23_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q23_editor = mo.ui.code_editor(value=get_answer('q23'), language="sql")
     q23_editor
     return (q23_editor,)
 
@@ -1041,8 +1053,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q24_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q24_editor = mo.ui.code_editor(value=get_answer('q24'), language="sql")
     q24_editor
     return (q24_editor,)
 
@@ -1090,8 +1102,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q25_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q25_editor = mo.ui.code_editor(value=get_answer('q25'), language="sql")
     q25_editor
     return (q25_editor,)
 
@@ -1132,8 +1144,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q26_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q26_editor = mo.ui.code_editor(value=get_answer('q26'), language="sql")
     q26_editor
     return (q26_editor,)
 
@@ -1171,8 +1183,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q27_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q27_editor = mo.ui.code_editor(value=get_answer('q27'), language="sql")
     q27_editor
     return (q27_editor,)
 
@@ -1231,8 +1243,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q28_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q28_editor = mo.ui.code_editor(value=get_answer('q28'), language="sql")
     q28_editor
     return (q28_editor,)
 
@@ -1283,8 +1295,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q29_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q29_editor = mo.ui.code_editor(value=get_answer('q29'), language="sql")
     q29_editor
     return (q29_editor,)
 
@@ -1338,8 +1350,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    q30_editor = __import__('marimo').ui.code_editor(value="-- Write your SQL here\n", language="sql")
+def _(get_answer, mo):
+    q30_editor = mo.ui.code_editor(value=get_answer('q30'), language="sql")
     q30_editor
     return (q30_editor,)
 
@@ -1390,8 +1402,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-    freeplay_editor = __import__('marimo').ui.code_editor(
+def _(mo):
+    freeplay_editor = mo.ui.code_editor(
         value="-- Explore freely!\nSELECT * FROM entity_metadata;\n",
         language="sql",
         min_height=200
