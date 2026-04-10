@@ -34,7 +34,7 @@ def _(mo):
         | `attribute_performance` | Keyword/attribute volume by site, date, source |
 
         ## How to Use
-        1. Read the question and hint
+        1. Read the question
         2. Write your SQL in the editor
         3. Hit **Run** — your results appear instantly
         4. Reveal the reference solution when you're ready
@@ -99,34 +99,6 @@ def _(mo, run_query):
 
 
 @app.cell
-def _(mo, run_query):
-    def make_exercise(label, difficulty, question, hint, solution, default_sql="-- Write your SQL here\n"):
-        """Return a marimo vstack representing one SQL exercise."""
-        stars = {"Easy": "⭐", "Medium": "⭐⭐", "Hard": "⭐⭐⭐", "Expert": "⭐⭐⭐⭐"}
-        header = mo.md(f"### {label} `[{difficulty} {stars.get(difficulty,'?')}]`\n\n{question}\n\n> 💡 **Hint:** {hint}")
-        editor = mo.ui.code_editor(value=default_sql, language="sql")
-        solution_toggle = mo.ui.switch(label="👁️ Show solution")
-
-        def render(ed_val, show_sol):
-            results_out = mo.md("_Run your query to see results._")
-            if ed_val.strip() and ed_val.strip() != default_sql.strip():
-                df, err = run_query(ed_val)
-                if err:
-                    results_out = mo.callout(mo.md(f"❌ **SQL Error:** `{err}`"), kind="danger")
-                elif df is not None:
-                    results_out = mo.vstack([
-                        mo.callout(mo.md(f"✅ **{len(df)} row(s) returned**"), kind="success"),
-                        mo.ui.table(df)
-                    ])
-            sol_out = mo.md(f"```sql\n{solution}\n```") if show_sol else mo.md("")
-            return mo.vstack([header, editor, results_out, solution_toggle, sol_out])
-
-        return render(editor.value, solution_toggle.value), editor, solution_toggle
-
-    return
-
-
-@app.cell
 def _(os):
     def get_answer(name: str) -> str:
         path = f"local_files/sql/{name}.txt"
@@ -145,7 +117,7 @@ def _(mo):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q1 `[Easy ⭐]`\n\nRetrieve all columns from `entity_metadata`.\n\n> 💡 **Hint:** Use `SELECT *`""")
+    mo.md("""### Q1 `[Easy ⭐]`\n\nTake a look at all the site metadata we have available.""")
     return
 
 
@@ -176,7 +148,7 @@ def _(mo, q1_editor, q1_sol, run_query):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q2 `[Easy ⭐]`\n\nList only the `entity_id` and `category` columns from `entity_metadata`.\n\n> 💡 **Hint:** Name the columns explicitly in SELECT.""")
+    mo.md("""### Q2 `[Easy ⭐]`\n\nWhich sites do we track, and what category does each belong to?""")
     return
 
 
@@ -207,7 +179,7 @@ def _(mo, q2_editor, q2_sol, run_query):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q3 `[Easy ⭐]`\n\nFind all entities in the `'E-commerce'` category.\n\n> 💡 **Hint:** Use `WHERE category = '...'`""")
+    mo.md("""### Q3 `[Easy ⭐]`\n\nWe're doing a competitive analysis on online retail. Which sites should we focus on?""")
     return
 
 
@@ -238,7 +210,7 @@ def _(mo, q3_editor, q3_sol, run_query):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q4 `[Easy ⭐]`\n\nReturn distinct `device_type` values from `metrics_daily`.\n\n> 💡 **Hint:** `SELECT DISTINCT`""")
+    mo.md("""### Q4 `[Easy ⭐]`\n\nWhat types of devices are represented in our traffic data?""")
     return
 
 
@@ -269,7 +241,7 @@ def _(mo, q4_editor, q4_sol, run_query):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q5 `[Easy ⭐]`\n\nFind rows in `metrics_daily` where `visits > 100000` AND `device_type = 'Mobile'`.\n\n> 💡 **Hint:** Chain conditions with `AND`.""")
+    mo.md("""### Q5 `[Easy ⭐]`\n\nHigh-traffic mobile days are a key signal for our ad team. Surface the relevant records, filtering for days that crossed a significant threshold (>100k).""")
     return
 
 
@@ -306,7 +278,7 @@ def _(mo):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q6 `[Easy ⭐]`\n\nHow many total rows are in `metrics_daily`?\n\n> 💡 **Hint:** `COUNT(*)`""")
+    mo.md("""### Q6 `[Easy ⭐]`\n\nHow much daily traffic data do we actually have?""")
     return
 
 
@@ -337,7 +309,7 @@ def _(mo, q6_editor, q6_sol, run_query):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q7 `[Easy ⭐]`\n\nFor each `entity_id` in `metrics_daily`, compute the **total visits** across all dates and device types. Order by total visits descending.\n\n> 💡 **Hint:** `SUM()` + `GROUP BY` + `ORDER BY ... DESC`""")
+    mo.md("""### Q7 `[Easy ⭐]`\n\nWhich sites drive the most overall traffic? Rank them.""")
     return
 
 
@@ -368,7 +340,7 @@ def _(mo, q7_editor, q7_sol, run_query):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q8 `[Medium ⭐⭐]`\n\nFor each `entity_id`, compute the **average daily visits** separately for Desktop and Mobile. Show entity_id, device_type, avg_visits. Round to 0 decimal places.\n\n> 💡 **Hint:** `GROUP BY entity_id, device_type` then `ROUND(AVG(visits), 0)`""")
+    mo.md("""### Q8 `[Medium ⭐⭐]`\n\nDoes Desktop or Mobile perform better per site on an average day? Break it down.""")
     return
 
 
@@ -399,7 +371,7 @@ def _(mo, q8_editor, q8_sol, run_query):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q9 `[Medium ⭐⭐]`\n\nWhich `entity_id` values had a **total visits (all devices) above 20,000,000** in 2025? List them with their totals.\n\n> 💡 **Hint:** Filter aggregations with `HAVING`. You may also need `WHERE event_date BETWEEN ...`""")
+    mo.md("""### Q9 `[Medium ⭐⭐]`\n\nNot all sites are created equal. Which ones are truly high-scale, with over 20M visits in 2025?""")
     return
 
 
@@ -430,7 +402,7 @@ def _(mo, q9_editor, q9_sol, run_query):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q10 `[Medium ⭐⭐]`\n\nFor each `attribute_name` in `attribute_performance`, compute the total volume from `'Organic'` sources vs `'Paid'` sources **side by side** (pivot-style). Columns: `attribute_name`, `organic_volume`, `paid_volume`.\n\n> 💡 **Hint:** Use `SUM(CASE WHEN source_type = 'Organic' THEN volume ELSE 0 END)` to pivot.""")
+    mo.md("""### Q10 `[Medium ⭐⭐]`\n\nFor each tracked keyword, how does organic volume compare to paid? Show them side by side.""")
     return
 
 
@@ -474,7 +446,7 @@ def _(mo):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q11 `[Easy ⭐]`\n\nJoin `metrics_daily` with `entity_metadata` to add `category` to each metrics row. Show: entity_id, category, event_date, device_type, visits. Limit to 10 rows.\n\n> 💡 **Hint:** `INNER JOIN ... ON m.entity_id = e.entity_id`""")
+    mo.md("""### Q11 `[Easy ⭐]`\n\nTraffic numbers alone don't tell the whole story — enrich the daily data with each site's industry category. Show a sample.""")
     return
 
 
@@ -510,7 +482,7 @@ def _(mo, q11_editor, q11_sol, run_query):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q12 `[Medium ⭐⭐]`\n\nFor each **category** (from `entity_metadata`), compute the total visits across all sites in that category. Show category + total_visits, ordered by total descending.\n\n> 💡 **Hint:** JOIN first, then GROUP BY category.""")
+    mo.md("""### Q12 `[Medium ⭐⭐]`\n\nWhich industry vertical generates the most traffic in aggregate?""")
     return
 
 
@@ -548,7 +520,7 @@ def _(mo, q12_editor, q12_sol, run_query):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q13 `[Medium ⭐⭐]`\n\nFor each entity, show `entity_id`, `category`, and how many distinct `attribute_name` values exist for it in `attribute_performance`. Include entities with zero attributes (use LEFT JOIN).\n\n> 💡 **Hint:** `LEFT JOIN` + `COUNT(DISTINCT ap.attribute_name)`""")
+    mo.md("""### Q13 `[Medium ⭐⭐]`\n\nAre all sites equally represented in our keyword data? Show how many distinct keywords each site has, and don't drop sites with none.""")
     return
 
 
@@ -587,7 +559,7 @@ def _(mo, q13_editor, q13_sol, run_query):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q14 `[Medium ⭐⭐]`\n\nFind `entity_id` values that appear in `metrics_daily` but **NOT** in `attribute_performance`.\n\n> 💡 **Hint:** Use `LEFT JOIN ... WHERE ap.entity_id IS NULL`, or `NOT IN (subquery)`, or `EXCEPT`.""")
+    mo.md("""### Q14 `[Medium ⭐⭐]`\n\nSome sites have traffic data but no keyword data at all. Find them.""")
     return
 
 
@@ -635,7 +607,7 @@ def _(mo):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q15 `[Medium ⭐⭐]`\n\nUsing a subquery, find all rows in `metrics_daily` where visits exceed the **overall average visits**.\n\n> 💡 **Hint:** `WHERE visits > (SELECT AVG(visits) FROM metrics_daily)`""")
+    mo.md("""### Q15 `[Medium ⭐⭐]`\n\nPull out the traffic records that are performing above par — above the overall daily average.""")
     return
 
 
@@ -671,7 +643,7 @@ def _(mo, q15_editor, q15_sol, run_query):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q16 `[Medium ⭐⭐]`\n\nUsing a **CTE**, compute per-entity total visits, then select only those above the median total.\n\n> 💡 **Hint:** `WITH total_visits AS (...) SELECT ... FROM total_visits WHERE ...`""")
+    mo.md("""### Q16 `[Medium ⭐⭐]`\n\nFocus on the sites punching above their weight. Which ones have total traffic above the median across all sites?""")
     return
 
 
@@ -715,7 +687,7 @@ def _(mo, q16_editor, q16_sol, run_query):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q17 `[Hard ⭐⭐⭐]`\n\nFind the **top-performing keyword** (by total volume) **for each entity**. Show entity_id, attribute_name, total_volume.\n\n> 💡 **Hint:** Aggregate volume per (entity, keyword), then use a CTE + `ROW_NUMBER()` or a correlated subquery to pick the top 1 per entity.""")
+    mo.md("""### Q17 `[Hard ⭐⭐⭐]`\n\nFor each site, what single keyword has driven the most volume? Show one winner per site.""")
     return
 
 
@@ -793,7 +765,7 @@ def _(mo):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q18 `[Medium ⭐⭐]`\n\nFor each entity and device type in `metrics_daily`, compute a **7-day rolling average** of visits (ordered by date). Show entity_id, device_type, event_date, visits, rolling_avg_7d.\n\n> 💡 **Hint:** `AVG(visits) OVER (PARTITION BY entity_id, device_type ORDER BY event_date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW)`""")
+    mo.md("""### Q18 `[Medium ⭐⭐]`\n\nRaw daily traffic is noisy. Smooth it out with a weekly rolling average per site and device type.""")
     return
 
 
@@ -837,7 +809,7 @@ def _(mo, q18_editor, q18_sol, run_query):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q19 `[Medium ⭐⭐]`\n\nRank entities by their **total visits** per device type using `DENSE_RANK()`. Show device_type, entity_id, total_visits, rank_within_device.\n\n> 💡 **Hint:** Aggregate first in a CTE, then apply `DENSE_RANK() OVER (PARTITION BY device_type ORDER BY total_visits DESC)`.""")
+    mo.md("""### Q19 `[Medium ⭐⭐]`\n\nWithin each device type, how do the sites stack up against each other? Produce a ranking that handles ties gracefully.""")
     return
 
 
@@ -880,7 +852,7 @@ def _(mo, q19_editor, q19_sol, run_query):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q20 `[Hard ⭐⭐⭐]`\n\nFor each entity + device type, compute the **day-over-day change in visits** (today minus yesterday). Show entity_id, device_type, event_date, visits, prev_visits, daily_delta.\n\n> 💡 **Hint:** `LAG(visits, 1) OVER (PARTITION BY entity_id, device_type ORDER BY event_date)`""")
+    mo.md("""### Q20 `[Hard ⭐⭐⭐]`\n\nIs traffic trending up or down day to day? Compute the daily swing for each site and device.""")
     return
 
 
@@ -921,7 +893,7 @@ def _(mo, q20_editor, q20_sol, run_query):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q21 `[Hard ⭐⭐⭐]`\n\nFor each entity, find the **single date** where Desktop visits were at their **all-time maximum**. Show entity_id, event_date, max_visits.\n\n> 💡 **Hint:** Use `RANK()` or `ROW_NUMBER()` partitioned by entity_id, ordered by visits DESC, then filter rank = 1.""")
+    mo.md("""### Q21 `[Hard ⭐⭐⭐]`\n\nEvery site has had its best day. Find it — per site, for desktop traffic only.""")
     return
 
 
@@ -971,7 +943,7 @@ def _(mo):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q22 `[Easy ⭐]`\n\nFor each row in `metrics_daily`, extract the **month number** and **year**. Show entity_id, event_date, month_num, year_num.\n\n> 💡 **Hint:** `MONTH(event_date)` and `YEAR(event_date)` work in DuckDB.""")
+    mo.md("""### Q22 `[Easy ⭐]`\n\nBreak apart the date dimension so we can slice traffic seasonally. Add month and year as separate columns.""")
     return
 
 
@@ -1009,7 +981,7 @@ def _(mo, q22_editor, q22_sol, run_query):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q23 `[Medium ⭐⭐]`\n\nAggregate total visits by **month** for each entity. Show entity_id, year_month (formatted as `'YYYY-MM'`), total_visits.\n\n> 💡 **Hint:** `strftime(event_date, '%Y-%m')` or `DATE_TRUNC('month', event_date)` in DuckDB.""")
+    mo.md("""### Q23 `[Medium ⭐⭐]`\n\nZoom out from daily noise — how does each site's traffic look when aggregated at the monthly level?""")
     return
 
 
@@ -1048,7 +1020,7 @@ def _(mo, q23_editor, q23_sol, run_query):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q24 `[Medium ⭐⭐]`\n\nIn `activity_logs`, find all events that occurred within **5 seconds of each other** for the same `subject_id`. Hint: this is the bot-detection pattern (user 9999).\n\n> 💡 **Hint:** Self-join `activity_logs` on `subject_id`, then `EPOCH(b.occured_at) - EPOCH(a.occured_at) BETWEEN 0 AND 5`""")
+    mo.md("""### Q24 `[Medium ⭐⭐]`\n\nOne of our users is behaving very suspiciously. Find pairs of events from the same user that happened almost back-to-back (within 5 seconds).""")
     return
 
 
@@ -1097,7 +1069,7 @@ def _(mo):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q25 `[Hard ⭐⭐⭐]`\n\n**Mobile share %** — For each entity and month, compute what percentage of total visits came from Mobile (vs Desktop). Show entity_id, year_month, mobile_pct.\n\n> 💡 **Hint:** Use conditional SUM (CASE WHEN) divided by total SUM, multiplied by 100.""")
+    mo.md("""### Q25 `[Hard ⭐⭐⭐]`\n\nMobile is eating the world — but unevenly. For each site, how has the mobile share of traffic evolved month over month?""")
     return
 
 
@@ -1139,7 +1111,7 @@ def _(mo, q25_editor, q25_sol, run_query):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q26 `[Hard ⭐⭐⭐]`\n\n**Detect bots** — Identify `subject_id` values in `activity_logs` that have **more than 5 events within any single minute**.\n\n> 💡 **Hint:** `DATE_TRUNC('minute', occured_at)` to bucket by minute, then `COUNT(*) > 5` with `HAVING`.""")
+    mo.md("""### Q26 `[Hard ⭐⭐⭐]`\n\nOur data pipeline may be ingesting bot traffic. Identify any users who fired an unusually high number of events within a single minute.""")
     return
 
 
@@ -1178,7 +1150,7 @@ def _(mo, q26_editor, q26_sol, run_query):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q27 `[Hard ⭐⭐⭐]`\n\n**Week-over-week growth** — For each entity + device type, compute the **% change in total weekly visits** vs the prior week. Show entity_id, device_type, week_start, weekly_visits, prev_week_visits, wow_growth_pct.\n\n> 💡 **Hint:** Aggregate to weekly level, then `LAG(...) OVER (PARTITION BY entity_id, device_type ORDER BY week_start)` to get prior week.""")
+    mo.md("""### Q27 `[Hard ⭐⭐⭐]`\n\nThe business wants to know if growth is accelerating or decelerating. Compute week-over-week traffic change for each site and device.""")
     return
 
 
@@ -1238,7 +1210,7 @@ def _(mo, q27_editor, q27_sol, run_query):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q28 `[Expert ⭐⭐⭐⭐]`\n\n**Traffic anomaly detection** — For each entity + device type, flag days where visits deviate more than **2 standard deviations** from the entity's mean. Show entity_id, device_type, event_date, visits, mean_visits, stddev_visits, z_score.\n\n> 💡 **Hint:** `AVG(visits) OVER (PARTITION BY ...)` and `STDDEV(visits) OVER (PARTITION BY ...)` — no ORDER BY needed (global window per partition). Then `z_score = (visits - mean) / stddev`.""")
+    mo.md("""### Q28 `[Expert ⭐⭐⭐⭐]`\n\nFlag statistically unusual traffic days — ones that look like outliers relative to each site's normal distribution. Use z-scores.""")
     return
 
 
@@ -1290,7 +1262,7 @@ def _(mo, q28_editor, q28_sol, run_query):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q29 `[Expert ⭐⭐⭐⭐]`\n\n**Funnel analysis** — A user 'session' is any sequence of clicks by the same `subject_id` where no gap between consecutive clicks exceeds 30 minutes. Assign a `session_id` to each click in `activity_logs`. Show subject_id, occured_at, entity_id, session_id.\n\n> 💡 **Hint:** Use `LAG` to get the previous event time per user, flag session breaks, then `SUM(is_new_session) OVER (PARTITION BY subject_id ORDER BY occured_at)` as a running session counter.""")
+    mo.md("""### Q29 `[Expert ⭐⭐⭐⭐]`\n\nReconstruct user sessions from raw event logs. A session ends when a user goes idle for more than 30 minutes. Assign each event a session number.""")
     return
 
 
@@ -1345,7 +1317,7 @@ def _(mo, q29_editor, q29_sol, run_query):
 
 @app.cell
 def _(mo):
-    mo.md("""### Q30 `[Expert ⭐⭐⭐⭐]`\n\n**Retention cohort** — For each entity, define Q1 2025 (Jan–Mar) as the 'acquisition' period. Compute the **month-2 retention rate**: of all (entity, device_type) combinations active in Q1, what fraction were also active in April 2025?\n\n> 💡 **Hint:** CTE for Q1 active entities, CTE for April active entities, then LEFT JOIN and compute retention = COUNT(april_active) / COUNT(q1_active).""")
+    mo.md("""### Q30 `[Expert ⭐⭐⭐⭐]`\n\nOf the site+device combinations that were active in Q1 2025, how many were still generating traffic in April? Compute the retention rate.""")
     return
 
 
