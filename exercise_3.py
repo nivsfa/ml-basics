@@ -54,18 +54,23 @@ def _(duckdb, mo, os):
             kind="danger"
         ))
 
-    def run_query(sql: str):
-        """Execute SQL against the analytics DuckDB and return a DataFrame."""
+    def run_query(sql: str, name: str = ""):
+        """Execute SQL against the analytics DuckDB and return a DataFrame.
+        If name is provided, saves the result as a CSV to local_files/sql/<name>.csv."""
         try:
             con = duckdb.connect(DB_PATH, read_only=True)
             result = con.execute(sql).df()
             con.close()
+            if name:
+                save_dir = "local_files/sql"
+                os.makedirs(save_dir, exist_ok=True)
+                result.to_csv(f"{save_dir}/{name}.csv", index=False)
             return result, None
         except Exception as e:
             return None, str(e)
 
     # Quick connectivity test
-    _test_df, _test_err = run_query("SELECT COUNT(*) AS n FROM entity_metadata")
+    _test_df, _test_err = run_query("SELECT COUNT(*) AS n FROM entity_metadata", 'test')
     if _test_err:
         mo.stop(True, mo.callout(mo.md(f"❌ DB connection failed: `{_test_err}`"), kind="danger"))
 
@@ -147,7 +152,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q1_editor, q1_sol, run_query):
-    _df, _err = run_query(q1_editor.value) if q1_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q1_editor.value, 'q1') if q1_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df)]) if _df is not None else mo.md("_Write your query above._")),
@@ -178,7 +183,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q2_editor, q2_sol, run_query):
-    _df, _err = run_query(q2_editor.value) if q2_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q2_editor.value, 'q2') if q2_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df)]) if _df is not None else mo.md("_Write your query above._")),
@@ -209,7 +214,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q3_editor, q3_sol, run_query):
-    _df, _err = run_query(q3_editor.value) if q3_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q3_editor.value, 'q3') if q3_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df)]) if _df is not None else mo.md("_Write your query above._")),
@@ -240,7 +245,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q4_editor, q4_sol, run_query):
-    _df, _err = run_query(q4_editor.value) if q4_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q4_editor.value, 'q4') if q4_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df)]) if _df is not None else mo.md("_Write your query above._")),
@@ -271,7 +276,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q5_editor, q5_sol, run_query):
-    _df, _err = run_query(q5_editor.value) if q5_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q5_editor.value, 'q5') if q5_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df.head(10))]) if _df is not None else mo.md("_Write your query above._")),
@@ -308,7 +313,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q6_editor, q6_sol, run_query):
-    _df, _err = run_query(q6_editor.value) if q6_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q6_editor.value, 'q6') if q6_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df)]) if _df is not None else mo.md("_Write your query above._")),
@@ -339,7 +344,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q7_editor, q7_sol, run_query):
-    _df, _err = run_query(q7_editor.value) if q7_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q7_editor.value, 'q7') if q7_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df)]) if _df is not None else mo.md("_Write your query above._")),
@@ -370,7 +375,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q8_editor, q8_sol, run_query):
-    _df, _err = run_query(q8_editor.value) if q8_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q8_editor.value, 'q8') if q8_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df)]) if _df is not None else mo.md("_Write your query above._")),
@@ -401,7 +406,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q9_editor, q9_sol, run_query):
-    _df, _err = run_query(q9_editor.value) if q9_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q9_editor.value, 'q9') if q9_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df)]) if _df is not None else mo.md("_Write your query above._")),
@@ -432,7 +437,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q10_editor, q10_sol, run_query):
-    _df, _err = run_query(q10_editor.value) if q10_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q10_editor.value, 'q10') if q10_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df)]) if _df is not None else mo.md("_Write your query above._")),
@@ -476,7 +481,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q11_editor, q11_sol, run_query):
-    _df, _err = run_query(q11_editor.value) if q11_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q11_editor.value, 'q11') if q11_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df)]) if _df is not None else mo.md("_Write your query above._")),
@@ -512,7 +517,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q12_editor, q12_sol, run_query):
-    _df, _err = run_query(q12_editor.value) if q12_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q12_editor.value, 'q12') if q12_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df)]) if _df is not None else mo.md("_Write your query above._")),
@@ -550,7 +555,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q13_editor, q13_sol, run_query):
-    _df, _err = run_query(q13_editor.value) if q13_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q13_editor.value, 'q13') if q13_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df)]) if _df is not None else mo.md("_Write your query above._")),
@@ -589,7 +594,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q14_editor, q14_sol, run_query):
-    _df, _err = run_query(q14_editor.value) if q14_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q14_editor.value, 'q14') if q14_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df)]) if _df is not None else mo.md("_Write your query above._")),
@@ -637,7 +642,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q15_editor, q15_sol, run_query):
-    _df, _err = run_query(q15_editor.value) if q15_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q15_editor.value, 'q15') if q15_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df.head(10))]) if _df is not None else mo.md("_Write your query above._")),
@@ -673,7 +678,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q16_editor, q16_sol, run_query):
-    _df, _err = run_query(q16_editor.value) if q16_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q16_editor.value, 'q16') if q16_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df)]) if _df is not None else mo.md("_Write your query above._")),
@@ -717,7 +722,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q17_editor, q17_sol, run_query):
-    _df, _err = run_query(q17_editor.value) if q17_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q17_editor.value, 'q17') if q17_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df)]) if _df is not None else mo.md("_Write your query above._")),
@@ -795,7 +800,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q18_editor, q18_sol, run_query):
-    _df, _err = run_query(q18_editor.value) if q18_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q18_editor.value, 'q18') if q18_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df.head(15))]) if _df is not None else mo.md("_Write your query above._")),
@@ -839,7 +844,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q19_editor, q19_sol, run_query):
-    _df, _err = run_query(q19_editor.value) if q19_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q19_editor.value, 'q19') if q19_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df)]) if _df is not None else mo.md("_Write your query above._")),
@@ -882,7 +887,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q20_editor, q20_sol, run_query):
-    _df, _err = run_query(q20_editor.value) if q20_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q20_editor.value, 'q20') if q20_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df.head(15))]) if _df is not None else mo.md("_Write your query above._")),
@@ -923,7 +928,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q21_editor, q21_sol, run_query):
-    _df, _err = run_query(q21_editor.value) if q21_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q21_editor.value, 'q21') if q21_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df)]) if _df is not None else mo.md("_Write your query above._")),
@@ -973,7 +978,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q22_editor, q22_sol, run_query):
-    _df, _err = run_query(q22_editor.value) if q22_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q22_editor.value, 'q22') if q22_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df.head(10))]) if _df is not None else mo.md("_Write your query above._")),
@@ -1011,7 +1016,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q23_editor, q23_sol, run_query):
-    _df, _err = run_query(q23_editor.value) if q23_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q23_editor.value, 'q23') if q23_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df.head(15))]) if _df is not None else mo.md("_Write your query above._")),
@@ -1050,7 +1055,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q24_editor, q24_sol, run_query):
-    _df, _err = run_query(q24_editor.value) if q24_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q24_editor.value, 'q24') if q24_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df.head(20))]) if _df is not None else mo.md("_Write your query above._")),
@@ -1099,7 +1104,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q25_editor, q25_sol, run_query):
-    _df, _err = run_query(q25_editor.value) if q25_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q25_editor.value, 'q25') if q25_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df.head(15))]) if _df is not None else mo.md("_Write your query above._")),
@@ -1141,7 +1146,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q26_editor, q26_sol, run_query):
-    _df, _err = run_query(q26_editor.value) if q26_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q26_editor.value, 'q26') if q26_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df)]) if _df is not None else mo.md("_Write your query above._")),
@@ -1180,7 +1185,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q27_editor, q27_sol, run_query):
-    _df, _err = run_query(q27_editor.value) if q27_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q27_editor.value, 'q27') if q27_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df.head(20))]) if _df is not None else mo.md("_Write your query above._")),
@@ -1240,7 +1245,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q28_editor, q28_sol, run_query):
-    _df, _err = run_query(q28_editor.value) if q28_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q28_editor.value, 'q28') if q28_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df.head(20))]) if _df is not None else mo.md("_Write your query above._")),
@@ -1292,7 +1297,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q29_editor, q29_sol, run_query):
-    _df, _err = run_query(q29_editor.value) if q29_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q29_editor.value, 'q29') if q29_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df.head(20))]) if _df is not None else mo.md("_Write your query above._")),
@@ -1347,7 +1352,7 @@ def _(mo):
 
 @app.cell
 def _(mo, q30_editor, q30_sol, run_query):
-    _df, _err = run_query(q30_editor.value) if q30_editor.value.strip() != "-- Write your SQL here" else (None, None)
+    _df, _err = run_query(q30_editor.value, 'q30') if q30_editor.value.strip() != "-- Write your SQL here" else (None, None)
     mo.vstack([
         (mo.callout(mo.md(f"❌ `{_err}`"), kind="danger") if _err else
          mo.vstack([mo.callout(mo.md(f"✅ {len(_df)} rows"), kind="success"), mo.ui.table(_df)]) if _df is not None else mo.md("_Write your query above._")),
@@ -1397,7 +1402,7 @@ def _():
 
 @app.cell
 def _(freeplay_editor, mo, run_query):
-    _df, _err = run_query(freeplay_editor.value)
+    _df, _err = run_query(freeplay_editor.value, 'freeplay')
     if _err:
         mo.callout(mo.md(f"❌ `{_err}`"), kind="danger")
     elif _df is not None:

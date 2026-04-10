@@ -1,11 +1,13 @@
--- Domain metadata for categorization
+-- db_exercises/schema.sql
+
+-- 1. Metadata for entities
 CREATE TABLE IF NOT EXISTS entity_metadata (
     entity_id VARCHAR PRIMARY KEY,
     category VARCHAR,
     sub_category VARCHAR
 );
 
--- Aggregated daily traffic
+-- 2. Daily aggregated metrics
 CREATE TABLE IF NOT EXISTS metrics_daily (
     entity_id VARCHAR,
     event_date DATE,
@@ -14,10 +16,19 @@ CREATE TABLE IF NOT EXISTS metrics_daily (
     PRIMARY KEY (entity_id, event_date, device_type)
 );
 
--- Raw clickstream logs for sessionization/bot detection
+-- 3. Raw behavioral logs
 CREATE TABLE IF NOT EXISTS activity_logs (
     subject_id INTEGER,
     occured_at TIMESTAMP,
     entity_id VARCHAR,
     activity_type VARCHAR
+);
+
+-- 4. Attribute/Keyword performance
+CREATE TABLE IF NOT EXISTS attribute_performance (
+    attribute_name VARCHAR,
+    entity_id VARCHAR,
+    event_date DATE,
+    source_type VARCHAR, 
+    volume INTEGER
 );
